@@ -5,19 +5,12 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
     },
-    homeScreenText: {
-        fontSize: 26,
-        fontWeight: "bold",
-        textAlign: "center",
-        textAlignVertical: "center",
-        flex: 1,
-    },
     header: {
         flexDirection: "row",
         justifyContent: "space-between",
         alignItems: "center",
         padding: 16,
-        marginTop: 50,
+        marginTop: 40,
     },
     headerLeft: {
         flex: 1,
@@ -27,20 +20,19 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
     },
     description: {
-        fontSize: 26,
+        fontSize: 16,
         marginTop: 8,
     },
-    postTab: {
+    segmentText: {
+        fontSize: 26,
+        fontWeight: "bold",
+        textAlign: "center",
+        textAlignVertical: "center",
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        width: '100%',
     },
-    likeTab: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        width: '100%',
+    segmentButton: {
+        marginLeft: 12,
+        marginRight: 12,
     },
 });
 
