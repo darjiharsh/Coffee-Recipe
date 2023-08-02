@@ -1,12 +1,14 @@
-import { View } from 'react-native';
+import { View, SafeAreaView } from 'react-native';
 import styles from './style';
-import { IconButton, MD3Colors, Text } from "react-native-paper";
+import { IconButton, MD3Colors, Text, SegmentedButtons } from "react-native-paper";
 import React from 'react';
-import { Tab, TabView } from '@rneui/themed';
 
 const Home = ({ navigation }) => {
 
-    const [index, setIndex] = React.useState(0);
+    const [value, setValue] = React.useState('');
+    React.useEffect(() => {
+        setValue('posts');
+    }, []);
 
     const handleProfileTap = () => {
         navigation.navigate('Logout');
@@ -31,41 +33,40 @@ const Home = ({ navigation }) => {
         </View>
     );
 
+    const renderSegmentContent = () => {
+        if (value === 'posts') {
+            return <Text style={styles.segmentText}>Post Section</Text>;
+        } else if (value === 'likes') {
+            return <Text style={styles.segmentText}>Like Section</Text>;
+        } else {
+            return null;
+        }
+    };
+
     return (
         <>
-            <View style={styles.container}>
-                {headerComponent()}
-                <Text style={styles.homeScreenText}>Home Screen</Text>
-            </View>
-            <Tab
-                value={index}
-                onChange={(e) => setIndex(e)}
-                indicatorStyle={{
-                    backgroundColor: 'white',
-                    height: 3,
-                }}
-                variant="primary"
-            >
-                <Tab.Item
-                    title="Posts"
-                    titleStyle={{ fontSize: 12 }}
-                    icon={{ name: 'list', type: 'ionicon', color: 'white' }}
+            <SafeAreaView style={styles.container}>
+            {headerComponent()}
+                <SegmentedButtons
+                    style={styles.segmentButton}
+                    value={value}
+                    onValueChange={setValue}
+                    buttons={[
+                        {
+                            value: 'posts',
+                            label: 'Posts',
+                            icon: 'post-outline',
+                            
+                        },
+                        {
+                            value: 'likes',
+                            label: 'Likes',
+                            icon: 'heart',
+                        },
+                    ]}
                 />
-                <Tab.Item
-                    title="Likes"
-                    titleStyle={{ fontSize: 12 }}
-                    icon={{ name: 'heart', type: 'ionicon', color: 'white' }}
-                />
-            </Tab>
-
-            <TabView value={index} onChange={setIndex} animationType="spring">
-                <TabView.Item style={styles.postTab}>
-                    <Text>Post</Text>
-                </TabView.Item>
-                <TabView.Item style={styles.likeTab}>
-                    <Text>Likes</Text>
-                </TabView.Item>
-            </TabView>
+                {renderSegmentContent()}
+            </SafeAreaView>
         </>
     );
 }
