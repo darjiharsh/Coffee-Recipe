@@ -1,5 +1,5 @@
-import { View, Button } from "react-native";
-import { Text } from "react-native-paper";
+import { View } from "react-native";
+import { Text, Button } from "react-native-paper";
 import styles from "./style";
 
 const Logout = ({ navigation }) => {
@@ -11,7 +11,10 @@ const Logout = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <Text style={styles.logoutScreenText}>Logout Screen</Text>
-            <Button style={styles.logoutButton} title="Logout" onPress={handleLogoutPress} />
+            <Button mode="contained"
+                    onPress={handleLogoutPress}>
+                    Logout!
+                </Button>
         </View>
     );
 }
