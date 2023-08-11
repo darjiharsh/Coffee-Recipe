@@ -8,7 +8,7 @@ import {
 } from "react-native-paper";
 import React from "react";
 import PostScreen from "../postscreen/posts";
-//import LikePage from "../likescreen/likes";
+import LikePage from "../likescreen/likes";
 
 const Home = ({ navigation }) => {
   const [value, setValue] = React.useState("");
@@ -43,7 +43,7 @@ const Home = ({ navigation }) => {
     if (value === "posts") {
       return <PostScreen />;
     } else if (value === "likes") {
-      // return <LikePage />;
+      return <LikePage />;
     } else {
       return null;
     }
