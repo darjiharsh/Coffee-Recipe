@@ -1,13 +1,21 @@
-import React, { useState, useEffect, useContext } from "react";
-import { StatusBar } from 'expo-status-bar';
-import { View, Alert, TouchableOpacity } from 'react-native';
-import { Text, TextInput, Button, Provider } from "react-native-paper";
+import React, { useState, useEffect, useContext, useRef } from "react";
+import { View, Alert, TouchableOpacity, ImageBackground } from 'react-native';
+import { Text, TextInput, Button, PaperProvider } from "react-native-paper";
 import styles from './style';
 import { auth } from '../database/config';
 import NetInfo from '@react-native-community/netinfo'
 import { AuthContext } from "../../components/contexts/AuthContext";
 import { Entypo } from '@expo/vector-icons';
 
+const theme = {
+    colors: {
+        primary: '#ad6d2f',
+        onPrimary: '#ffffff',
+        secondaryContainer: '#ffffff',
+        onSecondaryContainer: '#ad6d2f',
+        shadow: '#80411e',
+    },
+};
 
 const Login = ({ navigation }) => {
     const { login, signup } = useContext(AuthContext);
@@ -18,8 +26,7 @@ const Login = ({ navigation }) => {
     const [isConnected, setIsConnected] = useState(true);
     const [isRegistering, setIsRegistering] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-
-
+    const inputRef = useRef(null);
 
     const handleRegister = async () => {
         if (!isConnected) {
@@ -98,6 +105,9 @@ const Login = ({ navigation }) => {
     };
 
     const handleToggleView = () => {
+        if (inputRef.current) {
+            inputRef.current.blur();
+        }
         setShowLogin(!showLogin);
     };
 
@@ -111,8 +121,6 @@ const Login = ({ navigation }) => {
                 setIsRegistering(true);
                 console.log('User Status:', isRegistering);
                 console.log('Loggedin Login Subscribe:', isRegistering);
-            } else {
-                console.log('Testing');
             }
         })
 
@@ -134,69 +142,76 @@ const Login = ({ navigation }) => {
     }, [isConnected]);
 
     return (
-        <Provider>
+        <PaperProvider theme={theme}>
             <View style={styles.container}>
-                <View style={styles.headerContainer}>
-                    <Button
-                        mode={showLogin ? 'contained' : 'outlined'}
-                        onPress={handleToggleView}
-                        style={[styles.button, styles.buttonMargin]}
-                    >
-                        Login
-                    </Button>
+                <ImageBackground source={require('../../../assets/cafe_bg.png')} style={styles.backgroundImage}>
+                    <>
+                        <View style={styles.headerContainer}>
+                            <Button
+                                mode={showLogin ? 'contained' : 'contained-tonal'}
+                                onPress={handleToggleView}
+                                style={[styles.button, styles.buttonMargin]}
+                            >
+                                <Text variant="headlineSmall" style={{ fontWeight: 'bold' }}>Login</Text>
+                            </Button>
 
-                    <Button
-                        mode={showLogin ? 'outlined' : 'contained'}
-                        onPress={handleToggleView}
-                        style={styles.button}
-                    >
-                        Signup
-                    </Button>
-                </View>
-                <Text style={styles.header}>{showLogin ? 'Login' : 'Signup'}</Text>
-                <TextInput
-                    style={styles.input}
-                    onChangeText={(text) => setEmail(text)}
-                    value={email}
-                    placeholder='Email'
-                    autoCapitalize="none"
-                    selectionColor="#EE7CDC"
-                    keyboardType="email-address"
-                />
-                <View style={styles.passwordContainer}>
-                    <TextInput
-                        style={styles.passwordInput}
-                        placeholder="Password"
-                        secureTextEntry={!showPassword}
-                        onChangeText={(text) => setPassword(text)}
-                        value={password}
-                        selectionColor="#EE7CDC"
-                    />
-                    <TouchableOpacity onPress={togglePasswordVisibility}>
-                        <Entypo name={showPassword ? 'eye' : 'eye-with-line'} size={24} color="white" />
-                    </TouchableOpacity>
-                </View>
-                {!showLogin && (
-                    <View style={styles.passwordContainer}>
-                    <TextInput
-                        style={styles.passwordInput}
-                        placeholder="Confirm Password"
-                        secureTextEntry={!showPassword}
-                        onChangeText={(text) => setConfirmPassword(text)}
-                        value={confirmPassword}
-                        selectionColor="#EE7CDC"
-                    />
-                    <TouchableOpacity onPress={togglePasswordVisibility}>
-                        <Entypo name={showPassword ? 'eye' : 'eye-with-line'} size={24} color="white"/>
-                    </TouchableOpacity>
-                </View>
-                )}
-                <Button mode="contained"
-                    onPress={showLogin ? handleLoginPress : handleRegister}>
-                    Go!
-                </Button>
+                            <Button
+                                mode={showLogin ? 'contained-tonal' : 'contained'}
+                                onPress={handleToggleView}
+                                style={{...styles.button}}
+                            >
+                                <Text variant="headlineSmall" style={{ fontWeight: 'bold' }}>Signup</Text>
+                            </Button>
+                        </View>
+                        <Text style={styles.header}>{showLogin ? 'Login' : 'Signup'}</Text>
+                        <TextInput
+                            style={styles.input}
+                            onChangeText={(text) => setEmail(text)}
+                            value={email}
+                            placeholder='Email'
+                            autoCapitalize="none"
+                            selectionColor="#37251b"
+                            keyboardType="email-address"
+                            ref={inputRef}
+                        />
+                        <View style={styles.passwordContainer}>
+                            <TextInput
+                                style={styles.passwordInput}
+                                placeholder="Password"
+                                secureTextEntry={!showPassword}
+                                onChangeText={(text) => setPassword(text)}
+                                value={password}
+                                selectionColor="#37251b"
+                                ref={inputRef}
+                            />
+                            <TouchableOpacity onPress={togglePasswordVisibility}>
+                                <Entypo name={showPassword ? 'eye' : 'eye-with-line'} size={24} color="#80411e" />
+                            </TouchableOpacity>
+                        </View>
+                        {!showLogin && (
+                            <View style={styles.passwordContainer}>
+                                <TextInput
+                                    style={styles.passwordInput}
+                                    placeholder="Confirm Password"
+                                    secureTextEntry={!showPassword}
+                                    onChangeText={(text) => setConfirmPassword(text)}
+                                    value={confirmPassword}
+                                    selectionColor="#37251b"
+                                    ref={inputRef}
+                                />
+                                <TouchableOpacity onPress={togglePasswordVisibility}>
+                                    <Entypo name={showPassword ? 'eye' : 'eye-with-line'} size={24} color="#80411e" />
+                                </TouchableOpacity>
+                            </View>
+                        )}
+                        <Button mode="contained"
+                            onPress={showLogin ? handleLoginPress : handleRegister}>
+                            <Text variant="headlineSmall" style={{ fontWeight: 'bold' }}>Go!</Text>
+                        </Button>
+                    </>
+                </ImageBackground>
             </View>
-        </Provider>
+        </PaperProvider>
     );
 }
 
