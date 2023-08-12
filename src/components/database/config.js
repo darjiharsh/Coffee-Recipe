@@ -2,6 +2,7 @@
 import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
 import "firebase/compat/database";
+import "firebase/compat/storage";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -25,5 +26,6 @@ if (firebase.apps.length === 0) {
 
 const auth = firebase.auth();
 const database = firebase.database();
+const storage = firebase.storage();
 
-export { auth, database };
+export { auth, database,storage };

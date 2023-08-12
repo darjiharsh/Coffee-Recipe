@@ -1,78 +1,122 @@
-import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
-import { Appbar } from 'react-native-paper';
-import { useNavigation } from '@react-navigation/native';
-import { AuthContext } from '../contexts/AuthContext';
+import React, { useState, useContext } from "react";
+import { View, StyleSheet, Image } from "react-native";
+import {
+  Appbar,
+  Text,
+  TextInput,
+  Button,
+  ActivityIndicator,
+} from "react-native-paper";
+import { useNavigation } from "@react-navigation/native";
+import * as ImagePicker from "expo-image-picker";
+import { AuthContext } from "../contexts/AuthContext";
+import styles from "./style";
+import Toast from 'react-native-root-toast';
 
-const AddPostScreen = ({ }) => {
-    const { createPost } = useContext(AuthContext);
-  const [title, setTitle] = useState('');
-  const [imageURL, setImageURL] = useState('');
-  const [description, setDescription] = useState('');
+const AddPostScreen = () => {
+  const { uploadPost } = useContext(AuthContext);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const navigation = useNavigation();
+  const [imageUri, setImageUri] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleAddPost = () => {
-    createPost(title, description, imageURL);
-    setTitle('');
-    setDescription('');
-    setImageURL('');
+    if (!title || !description || !imageUri) {
+      let toast = Toast.show('Please fill in all the fields and select an image.', {
+        duration: Toast.durations.LONG,
+      });      
+      return;
+    }
+    else{
+      uploadPost(title, description, imageUri);
+
+      let toast = Toast.show('Post uploaded successfully.', {
+        duration: Toast.durations.LONG,
+      });
+
+      setTitle("");
+      setDescription("");
+      setImageUri("");
+    }
   };
 
   const goBack = () => {
     navigation.goBack();
-  }
+  };
+
+  const pickImage = async () => {
+    try {
+      setIsLoading(true);
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.All,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      if (!result.canceled) {
+        const pickedImageUri = result.assets[0].uri;
+        setImageUri(pickedImageUri);
+      } else {
+        setImageUri(null);
+      }
+    } catch (error) {
+      console.error("error->" + error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
-        <Appbar.Header>
-    <Appbar.BackAction onPress={() => goBack()} />
-    <Appbar.Content title="Add a New Post" />
-  </Appbar.Header>
+      <Appbar.Header>
+        <Appbar.BackAction onPress={() => goBack()} />
+        <Appbar.Content title="Add a New Post" />
+      </Appbar.Header>
 
       <TextInput
-        style={styles.input}
+        style={{ marginHorizontal: 20, marginTop: 10 }}
         placeholder="Title"
         value={title}
-        onChangeText={text => setTitle(text)}
+        onChangeText={(text) => setTitle(text)}
       />
-
       <TextInput
-        style={styles.input}
-        placeholder="Image URL"
-        value={imageURL}
-        onChangeText={text => setImageURL(text)}
-      />
-
-      <TextInput
-        style={styles.input}
+        style={{ marginHorizontal: 20, marginTop: 10 }}
         placeholder="Description"
-        multiline
         value={description}
-        onChangeText={text => setDescription(text)}
+        onChangeText={(text) => setDescription(text)}
       />
+      {isLoading ? (
+        <ActivityIndicator animating={true} color="blue" size="large" />
+      ) : (
+        <View style={styles.imageContainer}>
+          {imageUri && (
+            <Image source={{ uri: imageUri }} style={styles.image} />
+          )}
+        </View>
+      )}
 
-      <Button title="Add Post" onPress={handleAddPost} />
+      <View style={styles.buttonContainer}>
+        <Button mode={"outlined"} onPress={pickImage} style={styles.button}>
+          <Text variant="headlineSmall" style={{ fontWeight: "bold" }}>
+            Pick Image
+          </Text>
+        </Button>
+
+        <Button
+          mode={"contained-tonal"}
+          onPress={handleAddPost}
+          disabled={isLoading}
+          style={styles.button}
+        >
+          <Text variant="headlineSmall" style={{ fontWeight: "bold" }}>
+            Upload Post
+          </Text>
+        </Button>
+      </View>
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    //padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  input: {
-    marginBottom: 15,
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 5,
-  },
-});
 
 export default AddPostScreen;

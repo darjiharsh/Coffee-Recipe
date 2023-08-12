@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
-import { auth, database } from "../../components/database/config";
+import { auth, database, storage } from "../../components/database/config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const AuthContext = createContext();
@@ -97,25 +97,23 @@ const AuthProvider = ({ children }) => {
 
   const fetchPosts = async () => {
     try {
-      const postsRef = database.ref('posts');
-      const snapshot = await postsRef.once('value');
+      const postsRef = database.ref("posts");
+      const snapshot = await postsRef.once("value");
       const postsData = snapshot.val();
-
-      console.log('Fetched postsData:', postsData); 
 
       if (postsData) {
         const userLikesRef = database.ref(`likes/${uid}`);
-        const userLikesSnapshot = await userLikesRef.once('value');
+        const userLikesSnapshot = await userLikesRef.once("value");
         const userLikesData = userLikesSnapshot.val();
 
-        const postsArray = Object.keys(postsData).map(postId => {
+        const postsArray = Object.keys(postsData).map((postId) => {
           const postLikesInfo = userLikesData && userLikesData[postId];
           return {
             id: postId,
             title: postsData[postId].title,
             description: postsData[postId].description,
             image: postsData[postId].imageUrl,
-            liked: !!postLikesInfo, // Set liked status based on whether userLikesData exists
+            liked: !!postLikesInfo,
           };
         });
 
@@ -124,7 +122,7 @@ const AuthProvider = ({ children }) => {
         return [];
       }
     } catch (error) {
-      console.error('Error fetching posts:', error);
+      console.error("Error fetching posts:", error);
       throw error;
     }
   };
@@ -132,16 +130,16 @@ const AuthProvider = ({ children }) => {
   const fetchUserLikedPosts = async () => {
     try {
       const likedPostsRef = database.ref(`likes/${uid}`);
-      const likedPostsSnapshot = await likedPostsRef.once('value');
+      const likedPostsSnapshot = await likedPostsRef.once("value");
       const likedPostsData = likedPostsSnapshot.val();
-  
+
       if (likedPostsData) {
         const likedPostIds = Object.keys(likedPostsData);
-  
-        const postsRef = database.ref('posts');
-        const postsSnapshot = await postsRef.once('value');
+
+        const postsRef = database.ref("posts");
+        const postsSnapshot = await postsRef.once("value");
         const postsData = postsSnapshot.val();
-  
+
         if (postsData) {
           const likedPosts = likedPostIds.map((postId) => ({
             id: postId,
@@ -159,7 +157,7 @@ const AuthProvider = ({ children }) => {
         return [];
       }
     } catch (error) {
-      console.error('Error fetching user liked posts:', error);
+      console.error("Error fetching user liked posts:", error);
       throw error;
     }
   };
@@ -168,7 +166,7 @@ const AuthProvider = ({ children }) => {
     try {
       const user = auth.currentUser;
       if (user) {
-        const postsRef = database.ref('posts');
+        const postsRef = database.ref("posts");
         const newPostRef = postsRef.push();
         await newPostRef.set({
           author: user.uid,
@@ -176,10 +174,10 @@ const AuthProvider = ({ children }) => {
           description,
           imageUrl,
         });
-        console.log('Post created successfully');
+        console.log("Post created successfully");
       }
     } catch (error) {
-      console.error('Error creating post:', error);
+      console.error("Error creating post:", error);
       throw error;
     }
   };
@@ -189,33 +187,81 @@ const AuthProvider = ({ children }) => {
       const user = auth.currentUser;
       if (user) {
         const userLikesRef = database.ref(`likes/${user.uid}`);
-      
+
         if (liked) {
           // Add a like entry
-          console.log("Inside Liked")
           await userLikesRef.update({
-            [postId]: true
+            [postId]: true,
           });
         } else {
           // Remove the like entry
-          console.log("Removed Liked")
           await userLikesRef.child(postId).remove();
         }
       }
-      
+
       // Refresh liked posts after like/unlike
       const likedPosts = await fetchUserLikedPosts();
       // Use the state setter function to update the context's state
       setUserLikedPosts(likedPosts);
     } catch (error) {
-      console.error('Error toggling like:', error);
+      console.error("Error toggling like:", error);
       throw error;
     }
   };
 
+  const uploadPost = async (title, description, imageUri) => {
+    try {
+      const user = auth.currentUser;
+      if (!user) {
+        console.error("No user found");
+        return;
+      }
+
+      const response = await fetch(imageUri);
+      if (!response.ok) {
+        throw new Error("Image fetch failed");
+      }
+      const blob = await response.blob();
+      const storageRef = storage.ref();
+      const imageRef = storageRef.child(`images/posts/${user.uid}/${Date.now()}`);
+      const snapshot = await imageRef.put(blob);
+  
+      if (snapshot.state === "success") {
+        const imageUrl = await imageRef.getDownloadURL();
+        const postsRef = database.ref("posts");
+        const newPostRef = postsRef.push();
+        const postData = {
+          author: user.uid,
+          title: title,
+          description: description,
+          imageUrl: imageUrl,
+        };
+        await newPostRef.set(postData);
+        console.log("Post data uploaded successfully");
+      } else {
+        console.error("Image upload failed");
+      }
+    } catch (error) {
+      console.error("Error uploading post:", error);
+      throw error;
+    }
+  };
+  
+
   return (
     <AuthContext.Provider
-      value={{ user, uid, login, signup, logout, fetchPosts, fetchUserLikedPosts,updateLikeStatus, createPost }}
+      value={{
+        user,
+        uid,
+        login,
+        signup,
+        logout,
+        fetchPosts,
+        fetchUserLikedPosts,
+        updateLikeStatus,
+        createPost,
+        uploadPost,
+      }}
     >
       {children}
     </AuthContext.Provider>

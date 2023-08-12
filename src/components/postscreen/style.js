@@ -9,7 +9,6 @@ const styles = StyleSheet.create({
     marginLeft:10,
     fontSize: 24,
     fontWeight: "bold",
-    marginBottom: 16,
   },
   cardContent: {
     flexDirection: "row",
@@ -35,25 +34,15 @@ const styles = StyleSheet.create({
   likeIcon: {
     marginRight: 8,
   },
-  costRatingContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 8,
-  },
   leftContent: {
-    flexDirection: "column", // Change to column layout
-    alignItems: "flex-start", // Align items to the start
+    flexDirection: "column",
+    alignItems: "flex-start",
   },
-  commonStyle: {
-    marginBottom: 4, // Add margin to separate cost and rating
-  },
-  ratingContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  ratingText: {
-    marginRight: 4,
+  descriptionStyle: {
+    margin: 10,
+    marginBottom: 8,
+    fontSize: 16,
+    color: '#818589'
   },
   rightContent: {
     flexDirection: "row",
@@ -71,9 +60,16 @@ const styles = StyleSheet.create({
   hidden: {
     display: 'none',
   },
+  activityIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  showMoreText: {
+    color: 'blue',
+    marginBottom: 10,
+    marginLeft: 10
+  },
 });
 
 export default styles;
-
-
-

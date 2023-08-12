@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
-import { View, Text, FlatList } from "react-native";
-import { Card, IconButton, Avatar, MD3Colors } from 'react-native-paper';
+import { View, Text, FlatList, TouchableOpacity } from "react-native";
+import { Card, IconButton, Avatar, MD3Colors } from "react-native-paper";
 import styles from "./style";
 import { AuthContext } from "../contexts/AuthContext";
 
@@ -16,7 +16,6 @@ const LikePage = () => {
     try {
       const likedPosts = await fetchUserLikedPosts();
       setLikedPosts(likedPosts);
-      console.log("liked posts:", likedPosts);
     } catch (error) {
       console.error("Error fetching liked posts:", error);
     }
@@ -25,7 +24,6 @@ const LikePage = () => {
   const handleLikePress = async (postId, liked) => {
     try {
       await updateLikeStatus(postId, liked);
-      // Update the liked status in the UI by refetching liked posts
       fetchData();
     } catch (error) {
       console.error("Error toggling like:", error);
@@ -34,10 +32,12 @@ const LikePage = () => {
 
   const renderCustomCard = ({ item }) => {
     return (
-      <CustomCard
-        post={item}
-        onLikePress={(postId, liked) => handleLikePress(postId, liked)}
-      />
+      <TouchableOpacity>
+        <CustomCard
+          post={item}
+          onLikePress={(postId, liked) => handleLikePress(postId, liked)}
+        />
+      </TouchableOpacity>
     );
   };
 
@@ -53,7 +53,7 @@ const LikePage = () => {
           </View>
           <View style={styles.iconContainer}>
             <IconButton
-              icon={post.liked ? 'heart' : 'heart-outline'}
+              icon={post.liked ? "heart" : "heart-outline"}
               iconColor={post.liked ? MD3Colors.error50 : MD3Colors.secondary50}
               size={20}
               onPress={() => onLikePress(post.id, !post.liked)}
@@ -67,7 +67,7 @@ const LikePage = () => {
   return (
     <FlatList
       data={likedPosts}
-      keyExtractor={item => item.id.toString()}
+      keyExtractor={(item) => item.id.toString()}
       renderItem={renderCustomCard}
     />
   );

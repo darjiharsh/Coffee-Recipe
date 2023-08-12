@@ -10,7 +10,6 @@ const Logout = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.logoutScreenText}>Logout Screen</Text>
             <Button mode="contained"
                     onPress={handleLogoutPress}>
                     Logout!
