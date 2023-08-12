@@ -77,8 +77,11 @@ const PostScreen = ({}) => {
     setOffset(currentOffset);
   };
 
-  const toggleDescription = () => {
-    setShowFullDescription(!showFullDescription);
+  const toggleDescription = (postId) => {
+    setShowFullDescription((prev) => ({
+      ...prev,
+      [postId]: !prev[postId]
+    }));
   };
 
   const renderPostCard = ({ item: post }) => (
@@ -110,7 +113,7 @@ const PostScreen = ({}) => {
           <View style={styles.costRatingContainer}>
             <View style={styles.leftContent}>
               <Paragraph
-                numberOfLines={showFullDescription ? undefined : 2}
+                numberOfLines={showFullDescription[post.id] ? undefined : 2}
                 style={styles.descriptionStyle}
               >
                 Description: {post.description}
@@ -118,10 +121,10 @@ const PostScreen = ({}) => {
 
               {post.description.length > 35 && (
                 <Text
-                  onPress={() => toggleDescription()}
+                  onPress={() => toggleDescription(post.id)}
                   style={styles.showMoreText}
                 >
-                  {showFullDescription ? "Show Less" : "Show More"}
+                  {showFullDescription[post.id] ? "Show Less" : "Show More"}
                 </Text>
               )}
             </View>
