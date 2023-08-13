@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { Text, Button } from "react-native-paper";
+import { Button, FAB } from "react-native-paper";
 import styles from "./style";
 
 const Logout = ({ navigation }) => {
@@ -10,10 +10,12 @@ const Logout = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
-            <Button mode="contained"
-                    onPress={handleLogoutPress}>
-                    Logout!
-                </Button>
+            <FAB
+                icon="logout"
+                onPress={handleLogoutPress}
+                label="Logout"
+                mode="contained"
+            />
         </View>
     );
 }

@@ -42,7 +42,8 @@ const styles = StyleSheet.create({
     margin: 10,
     marginBottom: 8,
     fontSize: 16,
-    color: '#818589'
+    color: '#818589',
+    fontWeight: '400'
   },
   rightContent: {
     flexDirection: "row",
@@ -66,9 +67,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   showMoreText: {
-    color: 'blue',
+    color: 'brown',
     marginBottom: 10,
-    marginLeft: 10
+    marginLeft: 10,
+    fontWeight: 'bold'
   },
 });
 

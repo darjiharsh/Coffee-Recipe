@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     button: {
         flex: 1,
         borderColor: '#ad6d2f',
-        borderWidth: 2
+        borderWidth: 2,
     },
     buttonMargin:{
         marginHorizontal: 5
