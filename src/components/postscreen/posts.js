@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
 } from "react-native-paper";
 import styles from "./style";
-import { AuthContext } from "../contexts/AuthContext";
+import { AuthContext } from "../../contexts/AuthContext";
 import { useNavigation, useIsFocused} from "@react-navigation/native";
 
 const PostScreen = ({}) => {

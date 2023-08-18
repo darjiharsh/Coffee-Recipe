@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from "react";
 import { View, FlatList, TouchableOpacity } from "react-native";
 import { Card, IconButton, Avatar, MD3Colors, Modal, Portal, Text } from "react-native-paper";
 import styles from "./style";
-import { AuthContext } from "../contexts/AuthContext";
+import { AuthContext } from "../../contexts/AuthContext";
 
 const LikePage = () => {
   const { fetchUserLikedPosts, updateLikeStatus } = useContext(AuthContext);

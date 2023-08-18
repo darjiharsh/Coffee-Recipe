@@ -5,7 +5,7 @@ import Login from "../loginscreen/login";
 import Home from "../homescreen/home";
 import Logout from "../logoutscreen/logout";
 import AddPost from "../AddPost/addPost";
-import { AuthContext } from "../contexts/AuthContext";
+import { AuthContext } from "../../contexts/AuthContext";
 import { PaperProvider } from "react-native-paper";
 
 const Stack = createStackNavigator();

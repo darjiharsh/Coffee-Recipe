@@ -1,12 +1,11 @@
 import React, { createContext, useState, useEffect } from "react";
-import { auth, database, storage } from "../../components/database/config";
+import { auth, database, storage } from "../database/config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [uid, setUid] = useState(null);
   const [posts, setPosts] = useState([]);
   const [userLikedPosts, setUserLikedPosts] = useState([]);
@@ -20,10 +19,8 @@ const AuthProvider = ({ children }) => {
           setUser(parsedUser);
           setUid(parsedUser.uid);
         }
-        setLoading(false);
       } catch (error) {
         console.log("Error retrieving user from storage:", error);
-        setLoading(false);
       }
     };
 
@@ -46,13 +43,13 @@ const AuthProvider = ({ children }) => {
           console.log("Error removing user from storage:", error);
         }
       }
-      setLoading(false);
     });
 
     checkUser();
 
     return unsubscribe;
   }, []);
+
 
   const login = async (email, password) => {
     try {
@@ -225,7 +222,7 @@ const AuthProvider = ({ children }) => {
       const storageRef = storage.ref();
       const imageRef = storageRef.child(`images/posts/${user.uid}/${Date.now()}`);
       const snapshot = await imageRef.put(blob);
-  
+
       if (snapshot.state === "success") {
         const imageUrl = await imageRef.getDownloadURL();
         const postsRef = database.ref("posts");
@@ -246,7 +243,7 @@ const AuthProvider = ({ children }) => {
       throw error;
     }
   };
-  
+
 
   return (
     <AuthContext.Provider

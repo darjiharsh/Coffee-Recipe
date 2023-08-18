@@ -9,7 +9,7 @@ import {
 } from "react-native-paper";
 import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
-import { AuthContext } from "../contexts/AuthContext";
+import { AuthContext } from "../../contexts/AuthContext";
 import styles from "./style";
 import Toast from 'react-native-root-toast';
 

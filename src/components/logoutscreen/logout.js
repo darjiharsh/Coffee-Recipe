@@ -1,10 +1,14 @@
+import React, { useContext } from "react";
 import { View } from "react-native";
-import { Button, FAB } from "react-native-paper";
+import { FAB } from "react-native-paper";
 import styles from "./style";
+import { AuthContext } from "../../contexts/AuthContext";
 
 const Logout = ({ navigation }) => {
+    const { logout } = useContext(AuthContext);
 
     const handleLogoutPress = () => {
+        logout();
         navigation.navigate('Login');
     }
 

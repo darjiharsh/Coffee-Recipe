@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { View, Alert, TouchableOpacity, ImageBackground } from "react-native";
-import { Text, TextInput, Button } from "react-native-paper";
+import { Text, TextInput, Button, ActivityIndicator } from "react-native-paper";
 import styles from "./style";
-import { auth } from "../database/config";
+import { auth } from "../../database/config";
 import NetInfo from "@react-native-community/netinfo";
-import { AuthContext } from "../../components/contexts/AuthContext";
+import { AuthContext } from "../../contexts/AuthContext";
 import { Entypo } from "@expo/vector-icons";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Keychain from 'react-native-keychain'
 
 const Login = ({ navigation }) => {
   const { login, signup } = useContext(AuthContext);
@@ -16,7 +18,26 @@ const Login = ({ navigation }) => {
   const [isConnected, setIsConnected] = useState(true);
   const [isRegistering, setIsRegistering] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const inputRef = useRef(null);
+  
+  useEffect(() => {
+    const checkLoggedInUser = async () => {
+      const storedUser = await AsyncStorage.getItem("user");
+      if (storedUser) {
+        try {
+          const storedUserData = JSON.parse(storedUser);
+          await login(storedUserData.email, "123456");
+          setIsLoading(false);
+          navigation.navigate("Home");
+        } catch (error) {
+          console.log("Authentication error:", error);
+          setIsLoading(false);
+        }
+      } else { setIsLoading(false) }
+    };
+    checkLoggedInUser();
+  }, [navigation]);
 
   const handleRegister = async () => {
     if (!isConnected) {
@@ -56,6 +77,7 @@ const Login = ({ navigation }) => {
     try {
       await login(email, password);
       setIsRegistering(false);
+
       navigation.navigate("Home");
       clearForm();
     } catch (error) {
@@ -133,69 +155,53 @@ const Login = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <ImageBackground
-        source={require("../../../assets/cafe_bg.png")}
-        style={styles.backgroundImage}
-      >
-        <>
-          <View style={styles.headerContainer}>
-            <Button
-              mode={showLogin ? "contained" : "contained-tonal"}
-              onPress={handleToggleView}
-              style={[styles.button, styles.buttonMargin]}
-            >
-              <Text variant="headlineSmall" style={{ fontWeight: "bold" }}>
-                Login
-              </Text>
-            </Button>
+      {isLoading ? (
+        <ActivityIndicator />
+      ) : (
+        <ImageBackground
+          source={require("../../../assets/cafe_bg.png")}
+          style={styles.backgroundImage}
+        >
+          <>
+            <View style={styles.headerContainer}>
+              <Button
+                mode={showLogin ? "contained" : "contained-tonal"}
+                onPress={handleToggleView}
+                style={[styles.button, styles.buttonMargin]}
+              >
+                <Text variant="headlineSmall" style={{ fontWeight: "bold" }}>
+                  Login
+                </Text>
+              </Button>
 
-            <Button
-              mode={showLogin ? "contained-tonal" : "contained"}
-              onPress={handleToggleView}
-              style={{ ...styles.button }}
-            >
-              <Text variant="headlineSmall" style={{ fontWeight: "bold" }}>
-                Signup
-              </Text>
-            </Button>
-          </View>
-          <Text style={styles.header}>{showLogin ? "Login" : "Signup"}</Text>
-          <TextInput
-            style={styles.input}
-            onChangeText={(text) => setEmail(text)}
-            value={email}
-            placeholder="Email"
-            autoCapitalize="none"
-            selectionColor="#37251b"
-            keyboardType="email-address"
-            ref={inputRef}
-          />
-          <View style={styles.passwordContainer}>
+              <Button
+                mode={showLogin ? "contained-tonal" : "contained"}
+                onPress={handleToggleView}
+                style={{ ...styles.button }}
+              >
+                <Text variant="headlineSmall" style={{ fontWeight: "bold" }}>
+                  Signup
+                </Text>
+              </Button>
+            </View>
+            <Text style={styles.header}>{showLogin ? "Login" : "Signup"}</Text>
             <TextInput
-              style={styles.passwordInput}
-              placeholder="Password"
-              secureTextEntry={!showPassword}
-              onChangeText={(text) => setPassword(text)}
-              value={password}
+              style={styles.input}
+              onChangeText={(text) => setEmail(text)}
+              value={email}
+              placeholder="Email"
+              autoCapitalize="none"
               selectionColor="#37251b"
+              keyboardType="email-address"
               ref={inputRef}
             />
-            <TouchableOpacity onPress={togglePasswordVisibility}>
-              <Entypo
-                name={showPassword ? "eye" : "eye-with-line"}
-                size={24}
-                color="#80411e"
-              />
-            </TouchableOpacity>
-          </View>
-          {!showLogin && (
             <View style={styles.passwordContainer}>
               <TextInput
                 style={styles.passwordInput}
-                placeholder="Confirm Password"
+                placeholder="Password"
                 secureTextEntry={!showPassword}
-                onChangeText={(text) => setConfirmPassword(text)}
-                value={confirmPassword}
+                onChangeText={(text) => setPassword(text)}
+                value={password}
                 selectionColor="#37251b"
                 ref={inputRef}
               />
@@ -207,17 +213,38 @@ const Login = ({ navigation }) => {
                 />
               </TouchableOpacity>
             </View>
-          )}
-          <Button
-            mode="contained"
-            onPress={showLogin ? handleLoginPress : handleRegister}
-          >
-            <Text variant="headlineSmall" style={{ fontWeight: "bold" }}>
-              Go!
-            </Text>
-          </Button>
-        </>
-      </ImageBackground>
+            {!showLogin && (
+              <View style={styles.passwordContainer}>
+                <TextInput
+                  style={styles.passwordInput}
+                  placeholder="Confirm Password"
+                  secureTextEntry={!showPassword}
+                  onChangeText={(text) => setConfirmPassword(text)}
+                  value={confirmPassword}
+                  selectionColor="#37251b"
+                  ref={inputRef}
+                />
+                <TouchableOpacity onPress={togglePasswordVisibility}>
+                  <Entypo
+                    name={showPassword ? "eye" : "eye-with-line"}
+                    size={24}
+                    color="#80411e"
+                  />
+                </TouchableOpacity>
+              </View>
+            )}
+            <Button
+              mode="contained"
+              onPress={showLogin ? handleLoginPress : handleRegister}
+            >
+              <Text variant="headlineSmall" style={{ fontWeight: "bold" }}>
+                Go!
+              </Text>
+            </Button>
+          </>
+        </ImageBackground>
+      )}
+
     </View>
   );
 };
