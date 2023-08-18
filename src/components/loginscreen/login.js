@@ -6,8 +6,7 @@ import { auth } from "../../database/config";
 import NetInfo from "@react-native-community/netinfo";
 import { AuthContext } from "../../contexts/AuthContext";
 import { Entypo } from "@expo/vector-icons";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Keychain from 'react-native-keychain'
+import * as SecureStore from 'expo-secure-store';
 
 const Login = ({ navigation }) => {
   const { login, signup } = useContext(AuthContext);
@@ -18,26 +17,26 @@ const Login = ({ navigation }) => {
   const [isConnected, setIsConnected] = useState(true);
   const [isRegistering, setIsRegistering] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [textColor, setTextColor] = useState('white');
+  const [textColorTwo, setTextColorTwo] = useState('brown');
   const inputRef = useRef(null);
-  
+
   useEffect(() => {
     const checkLoggedInUser = async () => {
-      const storedUser = await AsyncStorage.getItem("user");
-      if (storedUser) {
-        try {
-          const storedUserData = JSON.parse(storedUser);
-          await login(storedUserData.email, "123456");
-          setIsLoading(false);
-          navigation.navigate("Home");
-        } catch (error) {
-          console.log("Authentication error:", error);
-          setIsLoading(false);
-        }
-      } else { setIsLoading(false) }
-    };
+      let email = await SecureStore.getItemAsync("email");
+      let pass = await SecureStore.getItemAsync("key");
+      if (email && pass) {
+        await login(email, pass);
+        setIsLoading(false);
+        navigation.navigate("Home");
+      } else {
+        console.log('No values stored.');
+        setIsLoading(false);
+      }
+    }
     checkLoggedInUser();
-  }, [navigation]);
+  }, []);
 
   const handleRegister = async () => {
     if (!isConnected) {
@@ -121,6 +120,8 @@ const Login = ({ navigation }) => {
       inputRef.current.blur();
     }
     setShowLogin(!showLogin);
+    setTextColor(showLogin ? 'brown' : 'white');
+    setTextColorTwo(showLogin ? 'white' : 'brown')
   };
 
   const togglePasswordVisibility = () => {
@@ -169,7 +170,7 @@ const Login = ({ navigation }) => {
                 onPress={handleToggleView}
                 style={[styles.button, styles.buttonMargin]}
               >
-                <Text variant="headlineSmall" style={{ fontWeight: "bold" }}>
+                <Text variant="headlineSmall" style={{ fontWeight: "bold", color:textColor }}>
                   Login
                 </Text>
               </Button>
@@ -179,7 +180,7 @@ const Login = ({ navigation }) => {
                 onPress={handleToggleView}
                 style={{ ...styles.button }}
               >
-                <Text variant="headlineSmall" style={{ fontWeight: "bold" }}>
+                <Text variant="headlineSmall" style={{ fontWeight: "bold", color:textColorTwo }}>
                   Signup
                 </Text>
               </Button>
@@ -237,7 +238,7 @@ const Login = ({ navigation }) => {
               mode="contained"
               onPress={showLogin ? handleLoginPress : handleRegister}
             >
-              <Text variant="headlineSmall" style={{ fontWeight: "bold" }}>
+              <Text variant="headlineSmall" style={{ fontWeight: "bold", color:'white' }}>
                 Go!
               </Text>
             </Button>

@@ -1,6 +1,7 @@
 import React, { createContext, useState, useEffect } from "react";
 import { auth, database, storage } from "../database/config";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as SecureStore from 'expo-secure-store';
 
 const AuthContext = createContext();
 
@@ -53,6 +54,8 @@ const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
+      await SecureStore.setItemAsync("email", email);
+      await SecureStore.setItemAsync("key", password);
       await auth.signInWithEmailAndPassword(email, password);
     } catch (error) {
       console.log("Login error:", error);
@@ -66,6 +69,8 @@ const AuthProvider = ({ children }) => {
         throw new Error("Email is required");
       }
 
+      await SecureStore.setItemAsync("email", email);
+      await SecureStore.setItemAsync("key", password);
       const { user } = await auth.createUserWithEmailAndPassword(
         email,
         password
@@ -85,6 +90,8 @@ const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
+      await SecureStore.deleteItemAsync("email");
+      await SecureStore.deleteItemAsync("key");
       await auth.signOut();
     } catch (error) {
       console.log("Logout error:", error);
